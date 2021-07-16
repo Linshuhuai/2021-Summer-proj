@@ -1,0 +1,7 @@
+制作物体爆炸模型
+===============
+方法一：
+利用blender制作物体爆炸前后的模型，Unity制作爆炸效果（用粒子系统）
+------------------------------------------------------------
+参考：https://blog.csdn.net/qq_37704442/article/details/106034668?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_title-0&spm=1001.2101.3001.4242
+
