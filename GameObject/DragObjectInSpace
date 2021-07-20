@@ -1,0 +1,81 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class DragObjectInSpace : MonoBehaviour
+{
+
+    //只针对指定的层级进行拖动
+    public LayerMask _dragLayerMask;
+    //指定当前要拖动的对象
+    private Transform currentTransform;
+    //是否可以拖动当前对象
+    private bool isDrag = false;
+
+    //射线碰撞点与物体中心的偏移
+    private Vector3 offest;
+    //射线碰撞点到屏幕的距离
+    private float distance;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector3 screenPosition;
+#if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
+            Touch touch = Input.GetTouch (0);
+            screenPosition = new Vector3 (touch.position.x, touch.position.y, 0);
+#else
+            screenPosition = Input.mousePosition;
+#endif
+            Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+            RaycastHit hitinfo;
+            if (Physics.Raycast(ray, out hitinfo, 1000f, _dragLayerMask))
+            {
+                isDrag = true;
+                currentTransform = hitinfo.transform;
+                distance = hitinfo.distance;
+                offest = currentTransform.position - hitinfo.point;
+            }
+            else
+            {
+                isDrag = false;
+            }
+        }
+        if (Input.GetMouseButton(0))
+        {
+            if (isDrag == true)
+            {
+
+                Vector3 screenPosition;
+#if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
+                Touch touch = Input.GetTouch (0);
+                screenPosition = new Vector3 (touch.position.x, touch.position.y, 0);
+#else
+                screenPosition = Input.mousePosition;
+#endif
+
+                Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+                RaycastHit hitInfo;
+
+                currentTransform.position = ray.GetPoint(distance) + offest;
+
+            }
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            isDrag = false;
+
+            currentTransform = null;
+
+        }
+    }
+
+}
