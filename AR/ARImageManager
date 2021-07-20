@@ -1,0 +1,115 @@
+*********************************************************************************
+* 识别图像并显示对应的模型, 锁定模型在屏幕中的位置（但移动手机还是会有偏移）, 解除锁定 *
+*********************************************************************************
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
+using UnityEngine.UI;
+
+public class ARImageManager : MonoBehaviour
+{
+
+    ARTrackedImageManager manager;
+    public XRReferenceImageLibrary library;
+
+
+    [SerializeField]
+    private GameObject[] prefabs;
+
+    private Dictionary<string, GameObject> spawnedPrefabs = new Dictionary<string, GameObject>();
+    private Dictionary<string, bool> lockState = new Dictionary<string, bool>();
+    private Dictionary<string, bool> trackState = new Dictionary<string, bool>();
+
+
+
+
+    // Start is called before the first frame update
+    void Awake()
+    {
+        manager = FindObjectOfType<ARTrackedImageManager>();
+        manager.referenceLibrary = library;
+        foreach(GameObject go in prefabs)
+        {
+            GameObject obj = Instantiate(go,Vector3.zero,Quaternion.identity);
+            obj.name = go.name;
+            
+            spawnedPrefabs.Add(go.name, obj);
+            spawnedPrefabs[go.name].SetActive(false);
+
+            lockState.Add(go.name, false);
+            trackState.Add(go.name, false);
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    void UpdateImage(ARTrackedImage trackedImage)
+    {
+        string name = trackedImage.referenceImage.name;
+        Vector3 position = trackedImage.transform.position;
+        GameObject obj = spawnedPrefabs[name];
+
+
+        if (trackedImage.trackingState != TrackingState.Tracking)
+        {
+            trackState[name] = false;
+            if(!lockState[name])
+                obj.SetActive(false);
+            else
+                obj.SetActive(true);
+            return;
+        }
+        trackState[name] = true;
+        obj.SetActive(true);
+        obj.transform.position = position;
+        
+    }
+
+    void OnEnable() => manager.trackedImagesChanged += OnChanged;
+
+    void OnDisable() => manager.trackedImagesChanged -= OnChanged;
+
+    void OnChanged(ARTrackedImagesChangedEventArgs eventArgs)
+    {
+        foreach (var newImage in eventArgs.added)
+        {
+            UpdateImage(newImage);
+        }
+
+        foreach (var updatedImage in eventArgs.updated)
+        {
+            UpdateImage(updatedImage);
+        }
+
+        foreach (var removedImage in eventArgs.removed)
+        {
+            spawnedPrefabs[removedImage.referenceImage.name].SetActive(false);
+            // Handle removed event
+        }
+    }
+
+// 锁定图像
+    public void ChangeLockState(string imageName)
+    {
+        if(!lockState[imageName])
+        {
+            lockState[imageName] = true;
+        }
+        else
+        {
+            lockState[imageName] = false;
+            if(!trackState[imageName])
+            {
+                spawnedPrefabs[imageName].SetActive(false);
+            }
+        }
+    }
+
+}
