@@ -1,0 +1,144 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
+
+public class DragObjectOnPlane : MonoBehaviour
+{
+    //可以拖动的层级
+    public LayerMask dragLayerMask;
+    //指定当前要拖动的对象
+    public Transform currentTransform;
+    //是否可以拖动当前对象
+    public bool isDrag = false;
+
+    public LayerMask groundLayerMask;
+
+
+    //布置烟花的UI与删除物体的UI
+    public GameObject uiCanvas;
+    public GameObject deleteObjectCanvas;
+
+
+    public float distance = 1f;
+
+    List<ARRaycastHit> hits = new List<ARRaycastHit>();
+
+    ARRaycastManager arRaycastManager;
+
+    private bool isARMode;
+
+    private bool onPlane;
+
+
+
+    private bool IsPointerOverUIObject()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
+    }
+
+    private void Start()
+    {
+        deleteObjectCanvas.SetActive(false);
+        arRaycastManager = FindObjectOfType<ARRaycastManager>();
+        isARMode = PlaceObjStageManager.Instance.isARMode;
+    }
+    void Update()
+    {
+        if (PlaceObjGlobal.stage != 1)
+            return;
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector3 screenPosition;
+#if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
+                Touch touch = Input.GetTouch (0);
+                screenPosition = new Vector3 (touch.position.x, touch.position.y, 0);
+#else
+            screenPosition = Input.mousePosition;
+#endif
+            var arCamera = FindObjectOfType<ARSessionOrigin>().camera;
+            if (!isARMode)
+                arCamera = Camera.main;
+            var ray = arCamera.ScreenPointToRay(screenPosition);
+            Debug.Log("drag");
+            RaycastHit hitinfo;
+            if (Physics.Raycast(ray, out hitinfo, 1000f, dragLayerMask))
+            {
+                isDrag = true;
+                onPlane = true;
+                //拖动时隐藏 "布置烟花UI",显示 "删除UI"
+                uiCanvas.SetActive(false);
+                deleteObjectCanvas.SetActive(true);
+                //将当前需要拖动的对象赋值为射线碰撞到的对象
+                currentTransform = hitinfo.transform;
+
+            }
+            else
+            {
+                isDrag = false;
+                Debug.Log("dragfail");
+            }
+        }
+        if (Input.GetMouseButton(0))
+        {
+            if (isDrag == true)
+            {
+
+
+                Vector3 screenPosition;
+#if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
+                Touch touch = Input.GetTouch (0);
+                screenPosition = new Vector3 (touch.position.x, touch.position.y, 0);
+#else
+                screenPosition = Input.mousePosition;
+#endif
+
+
+                var arCamera = FindObjectOfType<ARSessionOrigin>().camera;
+                if (!isARMode)
+                    arCamera = Camera.main;
+                var ray = arCamera.ScreenPointToRay(screenPosition);
+                RaycastHit hitinfo;
+
+                if (Physics.Raycast(ray, out hitinfo, 1000f, groundLayerMask))
+                {
+                    //currentTransform.position = hits[0].pose.position + new Vector3(0, currentTransform.lossyScale.y / 2, 0);
+                    currentTransform.position = hitinfo.point + new Vector3(0, currentTransform.lossyScale.y / 2, 0);
+                    onPlane = true;
+                }
+                else
+                {
+                    currentTransform.position = ray.GetPoint(distance);
+                    onPlane = false;
+                }
+
+            }
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+
+
+            //检测输入是否停留在deleteUI上，如果是则删除物体
+            if (isDrag && (IsPointerOverUIObject() || !onPlane))
+            {
+                GameObject.Destroy(currentTransform.gameObject);
+            }
+            isDrag = false;
+
+            currentTransform = null;
+
+            //恢复UI
+            uiCanvas.SetActive(true);
+            deleteObjectCanvas.SetActive(false);
+
+
+        }
+    }
+}
