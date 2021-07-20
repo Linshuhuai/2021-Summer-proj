@@ -61,7 +61,6 @@ public class DragObjectInSpace : MonoBehaviour
 #else
                 screenPosition = Input.mousePosition;
 #endif
-
                 Ray ray = Camera.main.ScreenPointToRay(screenPosition);
                 RaycastHit hitInfo;
 
