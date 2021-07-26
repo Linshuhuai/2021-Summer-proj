@@ -15,7 +15,7 @@ B站视频教程：https://www.bilibili.com/video/BV1YJ41197SU/?p=2&spm_id_from=
 
 ScriptableObject
 
-Inventory控制
+InventoryManager连接ui与数据
 
 ### 3、背包物品信息的显示
 
