@@ -15,8 +15,12 @@ B站视频教程：https://www.bilibili.com/video/BV1YJ41197SU/?p=2&spm_id_from=
 
 ScriptableObject
 
-InventoryManager连接ui与数据
+Inventory 背包类
+Item 物品类
 
 ### 3、背包物品信息的显示
+
+Slot 表示我的背包界面中MaterialGrid的小格子
+InventoryManager 连接ui与数据，将背包里物品信息显示在我的背包界面
 
 ### 4、实现拖拽效果(DragHandler接口)
