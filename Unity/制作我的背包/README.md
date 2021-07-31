@@ -3,6 +3,8 @@
 
 B站视频教程：https://www.bilibili.com/video/BV1YJ41197SU/?p=2&spm_id_from=pageDriver
 
+参考的一个游戏背包系统的框架：https://www.processon.com/view/link/5c651a9ce4b0c4e2165357fe
+
 ## 实现过程
 ### 1、UI图形界面设置
 * 想在Unity直接使用.png格式的图片，要设置图片Inspector面板中texture type的选项为Sprite（2D and UI）
