@@ -19,6 +19,15 @@ ScriptableObject
 
 Inventory 背包类
 Item 物品类
+InventoryManager 背包控制类
+
+#### 使用静态类变量存储实现单例
+
+   在场景FindMaterial场景中，hierachy里面有一个叫做InventoryManager的GameObject，并且这个物体还有挂着其他类型的子物体（BagCanvas）。需要保证这个物体在切换场景后仍然存在，并且只存在一个。
+具体代码见InventoryManager，其中要注意Awake函数中Destroy和DontDestroyOnLoad的运用，后者保证这个物体在切换场景后仍然存在，前者保证该物体只存在一个。
+
+**另外，挂在这个脚本上的子物体不能直接被当作函数的载体，因为这个物体在切换场景后回到原场景是有变化的。**  
+  E.G. BagCanvas里面有一个closeButton按钮，用于控制BagCanvas的显示与否，如果直接在Button的OnClick属性对BagCanvas使用SetActive(false)函数，在切换场景后回到原场景会失效。一个正确的方法是在InventoryManager脚本里加一个Button变量closeButton，closeButton实例化为closeButton，用`closeButton.onClick.AddListener(SetActiveFalse)`控制按钮开关。
 
 ### 3、背包物品信息的显示
 
