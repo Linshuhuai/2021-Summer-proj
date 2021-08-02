@@ -19,3 +19,5 @@
 * Unity ProBuilder三维建模：https://unity3d.com/unity/features/worldbuilding/probuilder
   * Unity的3D建模插件，学习成本相对较低，直接在Unity软件里就可以建模。
 *  免费模型纹理：https://www.textures.com/
+* 模型素材： https://sketchfab.com/feed
+* 图标设计： https://www.pinterest.com/
