@@ -31,7 +31,8 @@ InventoryManager 背包控制类
 
 ### 3、背包物品信息的显示
 
-Slot 表示我的背包界面中MaterialGrid的小格子
-InventoryManager 连接ui与数据，将背包里物品信息显示在我的背包界面
+Slot 表示我的背包界面中MaterialGrid的小格子，包括 slotItem（Item 类型）和 slotImage（Image 类型）两个参数，前者保存物体的信息，后者保存物体在背包中显示的icon图片。
+
+InventoryManager 连接ui与数据，将背包里物品信息显示在我的背包界面。其中CreateNewItem函数将收集到的物体展示在背包里，RefreshItem函数更新物品槽。每次打开背包的时候要调用RefreshItem函数更新一下。
 
 ### 4、实现拖拽效果(DragHandler接口)
